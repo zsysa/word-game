@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة تخمين الكلمة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      direction: rtl;
+      background-color: #121212;
+      color: white;
+    }
+    .screen {
+      display: none;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+    #welcomeScreen { display: flex; }
+    #startButton, #nextButton {
+      background-color: #FFD700;
+      color: black;
+      border: none;
+      font-size: 20px;
+      padding: 12px 24px;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
+    #nameInput {
+      padding: 10px;
+      font-size: 18px;
+      margin-top: 20px;
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+    }
+    #gameScreen {
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      align-items: center;
+    }
+    .row {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 5px;
+    }
+    .input-box {
+      width: 48px;
+      height: 48px;
+      font-size: 22px;
+      text-align: center;
+      text-transform: uppercase;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: white;
+      color: black;
+    }
+    .input-box.correct { background-color: #4caf50; color: white; }
+    .input-box.present { background-color: #ffc107; color: white; }
+    .input-box.wrong   { background-color: #f44336; color: white; }
+    #message {
+      margin-top: 20px;
+      font-size: 18px;
+      min-height: 30px;
+      text-align: center;
+    }
+    #leaderboard {
+      margin-top: 30px;
+      text-align: center;
+      width: 100%;
+    }
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+      width: 90%;
+      font-size: 16px;
+    }
+    th, td {
+      border: 1px solid white;
+      padding: 8px;
+    }
+    th { background-color: #333; }
+    @media (max-width: 500px) {
+      .input-box {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        line-height: 40px;
+      }
+      #startButton, #nextButton {
+        font-size: 18px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="welcomeScreen" class="screen">
+    <h1><i class="fas fa-gamepad"></i> منور لعبه التخمين المحفوفه </h1>
+    <input type="text" id="nameInput" placeholder="اكتب اسمك وخلك محترم">
+    <button id="startButton"><i class="fas fa-play"></i> ابدأ</button>
+    <p style="color: #ccc; font-size: 14px; margin-top: 10px;">إذا قد لعبت قبل، اكتب نفس اسمك عشان تكمل الإحصائيات</p>
+  </div>
+
+  <div id="gameScreen" class="screen">
+    <h2>منور يا <span id="playerName"></span> 👋</h2>
+    <p>لديك 9 محاولات لتخمين كلمة مكونة من <span id="wordLength">4</span> حروف.</p>
+    <div id="game"></div>
+    <div id="message"></div>
+    <button id="nextButton" style="display:none">محاولة ثانية 🔄</button>
+    <div id="leaderboard">
+      <h3><i class="fas fa-trophy"></i> لوحة الصدارة</h3>
+      <table>
+        <thead>
+          <tr><th>الاسم</th><th>صحيحة</th><th>خاطئة</th></tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const words = ["وردة", "نجم", "كوكب", "قمر", "سحاب", "نار", "نور", "شمس", "قهوة", "كتاب", "باب", "حياة", "ورق"];
+    let secretWord = "";
+    const maxAttempts = 9;
+    let currentRow = 0;
+    let playerName = "";
+    let playerStats = JSON.parse(localStorage.getItem("leaderboardStats")) || {};
+
+    const game = document.getElementById("game");
+    const message = document.getElementById("message");
+    const leaderboardBody = document.getElementById("leaderboardBody");
+
+    function pickRandomWord() {
+      secretWord = words[Math.floor(Math.random() * words.length)];
+      document.getElementById("wordLength").textContent = secretWord.length;
+    }
+
+    function createBoard() {
+      game.innerHTML = "";
+      for (let i = 0; i < maxAttempts; i++) {
+        const row = document.createElement("div");
+        row.classList.add("row");
+        for (let j = 0; j < secretWord.length; j++) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.maxLength = 1;
+          input.classList.add("input-box");
+          input.disabled = i !== 0;
+          input.addEventListener("input", (e) => {
+            input.value = input.value.toUpperCase();
+            if (input.value && input.nextElementSibling) input.nextElementSibling.focus();
+            checkIfRowComplete();
+          });
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && input.previousElementSibling) {
+              input.previousElementSibling.focus();
+            }
+          });
+          row.appendChild(input);
+        }
+        game.appendChild(row);
+      }
+    }
+
+    function checkIfRowComplete() {
+      const row = game.children[currentRow];
+      const inputs = row.querySelectorAll("input");
+      const guess = Array.from(inputs).map(inp => inp.value).join("");
+      if (guess.length === secretWord.length) {
+        setTimeout(() => checkWord(), 100);
+      }
+    }
+
+    function checkWord() {
+      const row = game.children[currentRow];
+      const inputs = row.querySelectorAll("input");
+      const guess = Array.from(inputs).map(inp => inp.value).join("");
+      if (guess.length !== secretWord.length) return;
+
+      let tempSecret = secretWord.split("");
+      let guessArr = guess.split("");
+
+      for (let i = 0; i < secretWord.length; i++) {
+        if (guessArr[i] === tempSecret[i]) {
+          inputs[i].classList.add("correct");
+          tempSecret[i] = null;
+          guessArr[i] = null;
+        }
+      }
+      for (let i = 0; i < secretWord.length; i++) {
+        if (guessArr[i] && tempSecret.includes(guessArr[i])) {
+          inputs[i].classList.add("present");
+          tempSecret[tempSecret.indexOf(guessArr[i])] = null;
+        } else if (guessArr[i]) {
+          inputs[i].classList.add("wrong");
+        }
+      }
+
+      const result = guess === secretWord;
+      if (!playerStats[playerName]) {
+        playerStats[playerName] = { correct: 0, wrong: 0 };
+      }
+
+      if (result) {
+        message.textContent = "🎉 مبروك! الكلمة صحيحة!";
+        playerStats[playerName].correct++;
+      } else if (currentRow + 1 >= maxAttempts) {
+        message.textContent = `❌ انتهت المحاولات! الكلمة كانت: ${secretWord}`;
+        playerStats[playerName].wrong++;
+      }
+
+      if (result || currentRow + 1 >= maxAttempts) {
+        updateLeaderboard();
+        document.getElementById("nextButton").style.display = "inline-block";
+      } else {
+        const nextRow = game.children[++currentRow];
+        if (nextRow) {
+          const inputs = nextRow.querySelectorAll("input");
+          inputs.forEach(inp => inp.disabled = false);
+          inputs[0].focus();
+        }
+      }
+    }
+
+    function updateLeaderboard() {
+      localStorage.setItem("leaderboardStats", JSON.stringify(playerStats));
+      leaderboardBody.innerHTML = "";
+      const sorted = Object.entries(playerStats).sort((a, b) => b[1].correct - a[1].correct);
+      for (const [name, stats] of sorted) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${name}</td><td>${stats.correct}</td><td>${stats.wrong}</td>`;
+        leaderboardBody.appendChild(row);
+      }
+    }
+
+    function startGame() {
+      pickRandomWord();
+      createBoard();
+      currentRow = 0;
+      message.textContent = "";
+      document.getElementById("nextButton").style.display = "none";
+      game.querySelector(".input-box").focus();
+    }
+
+    document.getElementById("startButton").onclick = () => {
+      const nameInput = document.getElementById("nameInput").value.trim();
+      if (!nameInput) return alert("يرجى إدخال الاسم!");
+      playerName = nameInput;
+      document.getElementById("playerName").textContent = playerName;
+      document.getElementById("welcomeScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "flex";
+      if (!playerStats[playerName]) playerStats[playerName] = { correct: 0, wrong: 0 };
+      updateLeaderboard();
+      startGame();
+    };
+
+    document.getElementById("nextButton").onclick = () => {
+      startGame();
+    };
+  </script>
+</body>
+</html>

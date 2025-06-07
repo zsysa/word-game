@@ -114,6 +114,12 @@ let maxAttempts = 8;
 let wordLength = 4;
 let hintUsed = false;
 
+function normalizeArabic(text) {
+  return text.replace(/أ|إ|آ/g, "ا")
+             .replace(/ى/g, "ي")
+             .replace(/ة/g, "ه");
+}
+
 function showCategories() {
   playerName = document.getElementById("playerName").value.trim();
   if (!playerName) return alert("ادخل اسمك أولاً");
@@ -195,7 +201,7 @@ function checkWord() {
     }
   }
 
-  if (guess.join("") === currentWord) {
+  if (normalizeArabic(guess.join("")) === normalizeArabic(currentWord)) {
     document.getElementById("message").textContent = "🎉 مبروك!";
     saveStats(true);
   } else if (++currentRow >= maxAttempts) {

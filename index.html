@@ -1,4 +1,6 @@
-<!DOCTYPE html> 
+
+
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
@@ -85,7 +87,7 @@
 </div>
 
 <div id="gameScreen" class="screen">
-  <h2>منور يا  <span id="playerDisplay"></span></h2> 
+  <h2>منور يا <span id="playerDisplay"></span></h2>
   <p>الكلمة من <span id="wordLength"></span> حروف - المحاولة <span id="attemptNumber">1</span> من 8</p>
   <div id="game"></div>
   <div id="hintButton" onclick="useHint()">💡</div>
@@ -233,7 +235,7 @@ function saveStats(success) {
 
 function updateStats() {
   const stats = JSON.parse(localStorage.getItem("wordStats") || "{}")[playerName] || { wins: 0, losses: 0 };
-  document.getElementById("stats").textContent = ✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses};
+  document.getElementById("stats").textContent = `✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses}`;
 }
 
 function backToCategories() {

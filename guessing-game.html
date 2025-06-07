@@ -1,4 +1,3 @@
-
 <!DOCTYPE html> 
 <html lang="ar">
 <head>
@@ -234,7 +233,7 @@ function saveStats(success) {
 
 function updateStats() {
   const stats = JSON.parse(localStorage.getItem("wordStats") || "{}")[playerName] || { wins: 0, losses: 0 };
-  document.getElementById("stats").textContent = `✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses}`;
+  document.getElementById("stats").textContent = ✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses};
 }
 
 function backToCategories() {

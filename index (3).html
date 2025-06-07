@@ -1,11 +1,9 @@
-
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لعبة تخمين الكلمة</title>
+  <title>لعبة التخمين</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -14,264 +12,236 @@
       direction: rtl;
       background-color: #121212;
       color: white;
-    }
-    .screen {
-      display: none;
-      min-height: 100vh;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      text-align: center;
       padding: 20px;
     }
-    #welcomeScreen { display: flex; }
-    #startButton, #nextButton {
+    .screen { display: none; flex-direction: column; align-items: center; min-height: 100vh; justify-content: center; text-align: center; }
+    .visible { display: flex !important; }
+    button {
       background-color: #FFD700;
-      color: black;
       border: none;
-      font-size: 20px;
-      padding: 12px 24px;
-      cursor: pointer;
-      margin-top: 20px;
-      border-radius: 12px;
-    }
-    #nameInput {
-      padding: 10px;
+      padding: 10px 20px;
       font-size: 18px;
-      margin-top: 20px;
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
-      border-radius: 10px;
-      border: none;
-    }
-    #gameScreen {
-      display: none;
-      flex-direction: column;
-      padding: 20px;
-      align-items: center;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 10px;
     }
     .row {
       display: flex;
-      gap: 5px;
       justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 5px;
+      margin: 5px 0;
     }
     .input-box {
       width: 48px;
       height: 48px;
       font-size: 22px;
       text-align: center;
-      text-transform: uppercase;
-      border: 2px solid #ccc;
+      margin: 2px;
       border-radius: 8px;
-      background-color: white;
-      color: black;
+      border: none;
     }
-    .input-box.correct { background-color: #4caf50; color: white; }
-    .input-box.present { background-color: #ffc107; color: white; }
-    .input-box.wrong   { background-color: #f44336; color: white; }
-    #message {
-      margin-top: 20px;
+    .correct { background-color: green; color: white; }
+    .present { background-color: orange; color: white; }
+    .wrong { background-color: red; color: white; }
+    .category-btn {
+      padding: 14px;
       font-size: 18px;
-      min-height: 30px;
-      text-align: center;
+      border-radius: 14px;
+      margin: 6px;
+      width: 200px;
     }
-    #leaderboard {
-      margin-top: 30px;
-      text-align: center;
-      width: 100%;
+    #hintButton {
+      background-color: #FFD700;
+      font-size: 22px;
+      width: 48px;
+      height: 48px;
+      line-height: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      margin: 10px auto;
     }
-    table {
-      margin: 0 auto;
-      border-collapse: collapse;
-      width: 90%;
-      font-size: 16px;
-    }
-    th, td {
-      border: 1px solid white;
-      padding: 8px;
-    }
-    th { background-color: #333; }
-    @media (max-width: 500px) {
-      .input-box {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-        line-height: 40px;
-      }
-      #startButton, #nextButton {
-        font-size: 18px;
-        padding: 10px 20px;
-      }
+    #hintButton.used { background-color: gray; cursor: not-allowed; }
+    @media (max-width: 600px) {
+      .input-box { width: 42px; height: 42px; font-size: 18px; }
+      button { font-size: 16px; padding: 8px 16px; }
     }
   </style>
 </head>
 <body>
-  <div id="welcomeScreen" class="screen">
-    <h1><i class="fas fa-gamepad"></i> منور لعبه التخمين المحفوفه </h1>
-    <input type="text" id="nameInput" placeholder="اكتب اسمك وخلك محترم">
-    <button id="startButton"><i class="fas fa-play"></i> ابدأ</button>
-    <p style="color: #ccc; font-size: 14px; margin-top: 10px;">إذا قد لعبت قبل، اكتب نفس اسمك عشان تكمل الإحصائيات</p>
-  </div>
 
-  <div id="gameScreen" class="screen">
-    <h2>منور يا <span id="playerName"></span> 👋</h2>
-    <p>لديك 9 محاولات لتخمين كلمة مكونة من <span id="wordLength">4</span> حروف.</p>
-    <div id="game"></div>
-    <div id="message"></div>
-    <button id="nextButton" style="display:none">محاولة ثانية 🔄</button>
-    <div id="leaderboard">
-      <h3><i class="fas fa-trophy"></i> لوحة الصدارة</h3>
-      <table>
-        <thead>
-          <tr><th>الاسم</th><th>صحيحة</th><th>خاطئة</th></tr>
-        </thead>
-        <tbody id="leaderboardBody"></tbody>
-      </table>
-    </div>
-  </div>
+<div id="welcome" class="screen visible">
+  <h1>لعبة تخمين الكلمه</h1>
+  <input type="text" id="playerName" placeholder="حط اسمك" style="font-size:18px;padding:10px;border-radius:8px;width:80%;max-width:300px;">
+  <button onclick="showCategories()">ابدأ</button>
+</div>
 
-  <script>
-    const words = ["وردة", "نجم", "كوكب", "قمر", "سحاب", "نار", "نور", "شمس", "قهوة", "كتاب", "باب", "حياة", "ورق"];
-    let secretWord = "";
-    const maxAttempts = 9;
-    let currentRow = 0;
-    let playerName = "";
-    let playerStats = JSON.parse(localStorage.getItem("leaderboardStats")) || {};
+<div id="categories" class="screen">
+  <h2>اختر نوع الكلمات</h2>
+  <button class="category-btn" onclick="selectCategory('animals')">🐾 حيوانات</button>
+  <button class="category-btn" onclick="selectCategory('countries')">🌍 دول</button>
+  <button class="category-btn" onclick="selectCategory('fruits')">🍎 فواكه</button>
+  <button class="category-btn" onclick="selectCategory('vegetables')">🥦 خضار</button>
+</div>
 
-    const game = document.getElementById("game");
-    const message = document.getElementById("message");
-    const leaderboardBody = document.getElementById("leaderboardBody");
+<div id="gameScreen" class="screen">
+  <h2>منور يا  <span id="playerDisplay"></span></h2> 
+  <p>الكلمة من <span id="wordLength"></span> حروف - المحاولة <span id="attemptNumber">1</span> من 8</p>
+  <div id="game"></div>
+  <div id="hintButton" onclick="useHint()">💡</div>
+  <p id="message"></p>
+  <button id="retryButton">🔄 إعادة المحاولة</button>
+  <button onclick="backToCategories()">↩️ الرجوع للخلف</button>
+  <h3>📊 إحصائياتك</h3>
+  <div id="stats"></div>
+</div>
 
-    function pickRandomWord() {
-      secretWord = words[Math.floor(Math.random() * words.length)];
-      document.getElementById("wordLength").textContent = secretWord.length;
+<script>
+const wordsByCategory = {
+  animals: ["أسد", "نمر", "ذئب", "ثعلب", "دب", "فيل", "قط", "كلب", "بقرة", "ماعز", "حصان", "جمل", "أرنب", "غزال", "زرافة", "نسر", "صقر", "ببغاء", "عقاب", "دلفين"],
+  countries: ["مصر", "السعودية", "الكويت", "قطر", "الإمارات", "عمان", "اليمن", "العراق", "سوريا", "لبنان", "الأردن", "فلسطين", "تونس", "الجزائر", "المغرب", "ليبيا", "تركيا", "فرنسا", "ألمانيا"],
+  fruits: ["تفاح", "موز", "عنب", "برتقال", "خوخ", "توت", "كيوي", "مانجو", "أناناس", "ليمون", "رمان", "تين", "شمام", "بطيخ", "جوافة", "فراولة", "بلح", "تمر", "زيتون", "كرز"],
+  vegetables: ["بطاطس", "طماطم", "خيار", "جزر", "بصل", "فلفل", "سبانخ", "فجل", "كوسا", "نعناع", "قرع", "بامية", "كرفس", "ثوم", "بقدونس", "كزبرة", "شبت", "جرجير", "خس", "ملفوف"]
+};
+
+let playerName = "";
+let currentCategory = "";
+let currentWord = "";
+let currentRow = 0;
+let maxAttempts = 8;
+let wordLength = 4;
+let hintUsed = false;
+
+function showCategories() {
+  playerName = document.getElementById("playerName").value.trim();
+  if (!playerName) return alert("ادخل اسمك أولاً");
+  document.getElementById("welcome").classList.remove("visible");
+  document.getElementById("categories").classList.add("visible");
+}
+
+function selectCategory(category) {
+  currentCategory = category;
+  const randomLength = [4,5,6][Math.floor(Math.random()*3)];
+  startGame(randomLength);
+  document.getElementById("categories").classList.remove("visible");
+}
+
+function startGame(length) {
+  wordLength = length;
+  hintUsed = false;
+  document.getElementById("hintButton").classList.remove("used");
+  currentRow = 0;
+  const pool = wordsByCategory[currentCategory].filter(w => w.length === length);
+  currentWord = pool[Math.floor(Math.random() * pool.length)];
+  document.getElementById("playerDisplay").textContent = playerName;
+  document.getElementById("wordLength").textContent = wordLength;
+  document.getElementById("attemptNumber").textContent = 1;
+  document.getElementById("message").textContent = "";
+  document.getElementById("game").innerHTML = "";
+  document.getElementById("gameScreen").classList.add("visible");
+  generateBoard();
+  updateStats();
+}
+
+function generateBoard() {
+  const board = document.getElementById("game");
+  for (let i = 0; i < maxAttempts; i++) {
+    const row = document.createElement("div");
+    row.classList.add("row");
+    for (let j = 0; j < wordLength; j++) {
+      const input = document.createElement("input");
+      input.className = "input-box";
+      input.maxLength = 1;
+      input.disabled = i !== 0;
+      input.addEventListener("input", () => {
+        input.value = input.value.toUpperCase();
+        if (input.value && input.nextElementSibling) input.nextElementSibling.focus();
+        checkIfRowComplete();
+      });
+      row.appendChild(input);
     }
+    board.appendChild(row);
+  }
+  board.querySelector("input").focus();
+}
 
-    function createBoard() {
-      game.innerHTML = "";
-      for (let i = 0; i < maxAttempts; i++) {
-        const row = document.createElement("div");
-        row.classList.add("row");
-        for (let j = 0; j < secretWord.length; j++) {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.maxLength = 1;
-          input.classList.add("input-box");
-          input.disabled = i !== 0;
-          input.addEventListener("input", (e) => {
-            input.value = input.value.toUpperCase();
-            if (input.value && input.nextElementSibling) input.nextElementSibling.focus();
-            checkIfRowComplete();
-          });
-          input.addEventListener("keydown", (e) => {
-            if (e.key === "Backspace" && !input.value && input.previousElementSibling) {
-              input.previousElementSibling.focus();
-            }
-          });
-          row.appendChild(input);
-        }
-        game.appendChild(row);
-      }
+function checkIfRowComplete() {
+  const row = document.getElementById("game").children[currentRow];
+  const guess = [...row.querySelectorAll("input")].map(i => i.value).join("");
+  if (guess.length === wordLength) setTimeout(checkWord, 100);
+}
+
+function checkWord() {
+  const row = document.getElementById("game").children[currentRow];
+  const guess = [...row.querySelectorAll("input")].map(i => i.value);
+  const inputs = row.querySelectorAll("input");
+  let temp = currentWord.split("");
+
+  for (let i = 0; i < wordLength; i++) {
+    if (guess[i] === temp[i]) {
+      inputs[i].classList.add("correct");
+      temp[i] = null;
+      guess[i] = null;
     }
-
-    function checkIfRowComplete() {
-      const row = game.children[currentRow];
-      const inputs = row.querySelectorAll("input");
-      const guess = Array.from(inputs).map(inp => inp.value).join("");
-      if (guess.length === secretWord.length) {
-        setTimeout(() => checkWord(), 100);
-      }
+  }
+  for (let i = 0; i < wordLength; i++) {
+    if (guess[i] && temp.includes(guess[i])) {
+      inputs[i].classList.add("present");
+      temp[temp.indexOf(guess[i])] = null;
+    } else if (guess[i]) {
+      inputs[i].classList.add("wrong");
     }
+  }
 
-    function checkWord() {
-      const row = game.children[currentRow];
-      const inputs = row.querySelectorAll("input");
-      const guess = Array.from(inputs).map(inp => inp.value).join("");
-      if (guess.length !== secretWord.length) return;
+  if (guess.join("") === currentWord) {
+    document.getElementById("message").textContent = "🎉 مبروك!";
+    saveStats(true);
+  } else if (++currentRow >= maxAttempts) {
+    document.getElementById("message").textContent = "❌ انتهت المحاولات! الكلمة كانت: " + currentWord;
+    saveStats(false);
+  } else {
+    const nextRow = document.getElementById("game").children[currentRow];
+    [...nextRow.querySelectorAll("input")].forEach(inp => inp.disabled = false);
+    nextRow.querySelector("input").focus();
+    document.getElementById("attemptNumber").textContent = currentRow + 1;
+  }
+}
 
-      let tempSecret = secretWord.split("");
-      let guessArr = guess.split("");
+function useHint() {
+  if (hintUsed) return;
+  const correctIndex = currentWord.split("").findIndex((ch, i) => {
+    const row = document.getElementById("game").children[currentRow];
+    return row && row.children[i].value !== ch;
+  });
+  if (correctIndex >= 0) {
+    const row = document.getElementById("game").children[currentRow];
+    row.children[correctIndex].value = currentWord[correctIndex];
+    row.children[correctIndex].classList.add("correct");
+    hintUsed = true;
+    document.getElementById("hintButton").classList.add("used");
+  }
+}
 
-      for (let i = 0; i < secretWord.length; i++) {
-        if (guessArr[i] === tempSecret[i]) {
-          inputs[i].classList.add("correct");
-          tempSecret[i] = null;
-          guessArr[i] = null;
-        }
-      }
-      for (let i = 0; i < secretWord.length; i++) {
-        if (guessArr[i] && tempSecret.includes(guessArr[i])) {
-          inputs[i].classList.add("present");
-          tempSecret[tempSecret.indexOf(guessArr[i])] = null;
-        } else if (guessArr[i]) {
-          inputs[i].classList.add("wrong");
-        }
-      }
+function saveStats(success) {
+  let stats = JSON.parse(localStorage.getItem("wordStats") || "{}");
+  if (!stats[playerName]) stats[playerName] = { wins: 0, losses: 0 };
+  if (success) stats[playerName].wins++;
+  else stats[playerName].losses++;
+  localStorage.setItem("wordStats", JSON.stringify(stats));
+  updateStats();
+}
 
-      const result = guess === secretWord;
-      if (!playerStats[playerName]) {
-        playerStats[playerName] = { correct: 0, wrong: 0 };
-      }
+function updateStats() {
+  const stats = JSON.parse(localStorage.getItem("wordStats") || "{}")[playerName] || { wins: 0, losses: 0 };
+  document.getElementById("stats").textContent = ✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses};
+}
 
-      if (result) {
-        message.textContent = "🎉 مبروك! الكلمة صحيحة!";
-        playerStats[playerName].correct++;
-      } else if (currentRow + 1 >= maxAttempts) {
-        message.textContent = `❌ انتهت المحاولات! الكلمة كانت: ${secretWord}`;
-        playerStats[playerName].wrong++;
-      }
+function backToCategories() {
+  document.getElementById("gameScreen").classList.remove("visible");
+  document.getElementById("categories").classList.add("visible");
+}
 
-      if (result || currentRow + 1 >= maxAttempts) {
-        updateLeaderboard();
-        document.getElementById("nextButton").style.display = "inline-block";
-      } else {
-        const nextRow = game.children[++currentRow];
-        if (nextRow) {
-          const inputs = nextRow.querySelectorAll("input");
-          inputs.forEach(inp => inp.disabled = false);
-          inputs[0].focus();
-        }
-      }
-    }
-
-    function updateLeaderboard() {
-      localStorage.setItem("leaderboardStats", JSON.stringify(playerStats));
-      leaderboardBody.innerHTML = "";
-      const sorted = Object.entries(playerStats).sort((a, b) => b[1].correct - a[1].correct);
-      for (const [name, stats] of sorted) {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${name}</td><td>${stats.correct}</td><td>${stats.wrong}</td>`;
-        leaderboardBody.appendChild(row);
-      }
-    }
-
-    function startGame() {
-      pickRandomWord();
-      createBoard();
-      currentRow = 0;
-      message.textContent = "";
-      document.getElementById("nextButton").style.display = "none";
-      game.querySelector(".input-box").focus();
-    }
-
-    document.getElementById("startButton").onclick = () => {
-      const nameInput = document.getElementById("nameInput").value.trim();
-      if (!nameInput) return alert("يرجى إدخال الاسم!");
-      playerName = nameInput;
-      document.getElementById("playerName").textContent = playerName;
-      document.getElementById("welcomeScreen").style.display = "none";
-      document.getElementById("gameScreen").style.display = "flex";
-      if (!playerStats[playerName]) playerStats[playerName] = { correct: 0, wrong: 0 };
-      updateLeaderboard();
-      startGame();
-    };
-
-    document.getElementById("nextButton").onclick = () => {
-      startGame();
-    };
-  </script>
+document.getElementById("retryButton").addEventListener("click", () => startGame(wordLength));
+</script>
 </body>
 </html>

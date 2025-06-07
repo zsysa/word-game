@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
@@ -69,6 +69,7 @@
   </style>
 </head>
 <body>
+
 <div id="welcome" class="screen visible">
   <h1>لعبة تخمين الكلمه</h1>
   <input type="text" id="playerName" placeholder="حط اسمك" style="font-size:18px;padding:10px;border-radius:8px;width:80%;max-width:300px;">
@@ -84,7 +85,7 @@
 </div>
 
 <div id="gameScreen" class="screen">
-  <h2>منورً <span id="playerDisplay"></span></h2>
+  <h2>منور يا  <span id="playerDisplay"></span></h2> 
   <p>الكلمة من <span id="wordLength"></span> حروف - المحاولة <span id="attemptNumber">1</span> من 8</p>
   <div id="game"></div>
   <div id="hintButton" onclick="useHint()">💡</div>
@@ -94,6 +95,7 @@
   <h3>📊 إحصائياتك</h3>
   <div id="stats"></div>
 </div>
+
 <script>
 const wordsByCategory = {
   animals: ["أسد", "نمر", "ذئب", "ثعلب", "دب", "فيل", "قط", "كلب", "بقرة", "ماعز", "حصان", "جمل", "أرنب", "غزال", "زرافة", "نسر", "صقر", "ببغاء", "عقاب", "دلفين"],
@@ -231,7 +233,7 @@ function saveStats(success) {
 
 function updateStats() {
   const stats = JSON.parse(localStorage.getItem("wordStats") || "{}")[playerName] || { wins: 0, losses: 0 };
-  document.getElementById("stats").textContent = `✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses}`;
+  document.getElementById("stats").textContent = ✅ صحيحة: ${stats.wins} | ❌ خاطئة: ${stats.losses};
 }
 
 function backToCategories() {

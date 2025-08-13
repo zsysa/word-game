@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -114,12 +112,6 @@ let maxAttempts = 8;
 let wordLength = 4;
 let hintUsed = false;
 
-function normalizeArabic(text) {
-  return text.replace(/أ|إ|آ/g, "ا")
-             .replace(/ى/g, "ي")
-             .replace(/ة/g, "ه");
-}
-
 function showCategories() {
   playerName = document.getElementById("playerName").value.trim();
   if (!playerName) return alert("ادخل اسمك أولاً");
@@ -162,7 +154,6 @@ function generateBoard() {
       input.maxLength = 1;
       input.disabled = i !== 0;
       input.addEventListener("input", () => {
-        input.value = input.value.toUpperCase();
         if (input.value && input.nextElementSibling) input.nextElementSibling.focus();
         checkIfRowComplete();
       });
@@ -181,31 +172,38 @@ function checkIfRowComplete() {
 
 function checkWord() {
   const row = document.getElementById("game").children[currentRow];
-  const guess = [...row.querySelectorAll("input")].map(i => i.value);
   const inputs = row.querySelectorAll("input");
+  const guessArray = [...inputs].map(i => i.value);
+  const originalGuess = guessArray.join("");
+
   let temp = currentWord.split("");
 
   for (let i = 0; i < wordLength; i++) {
-    if (guess[i] === temp[i]) {
+    if (guessArray[i] === temp[i]) {
       inputs[i].classList.add("correct");
       temp[i] = null;
-      guess[i] = null;
+      guessArray[i] = null;
     }
   }
   for (let i = 0; i < wordLength; i++) {
-    if (guess[i] && temp.includes(guess[i])) {
+    if (guessArray[i] && temp.includes(guessArray[i])) {
       inputs[i].classList.add("present");
-      temp[temp.indexOf(guess[i])] = null;
-    } else if (guess[i]) {
+      temp[temp.indexOf(guessArray[i])] = null;
+    } else if (guessArray[i]) {
       inputs[i].classList.add("wrong");
     }
   }
 
-  if (normalizeArabic(guess.join("")) === normalizeArabic(currentWord)) {
+  if (originalGuess === currentWord) {
     document.getElementById("message").textContent = "🎉 مبروك!";
+    disableAllInputs();
     saveStats(true);
-  } else if (++currentRow >= maxAttempts) {
+    return;
+  }
+
+  if (++currentRow >= maxAttempts) {
     document.getElementById("message").textContent = "❌ انتهت المحاولات! الكلمة كانت: " + currentWord;
+    disableAllInputs();
     saveStats(false);
   } else {
     const nextRow = document.getElementById("game").children[currentRow];
@@ -213,6 +211,10 @@ function checkWord() {
     nextRow.querySelector("input").focus();
     document.getElementById("attemptNumber").textContent = currentRow + 1;
   }
+}
+
+function disableAllInputs() {
+  document.querySelectorAll(".input-box").forEach(inp => inp.disabled = true);
 }
 
 function useHint() {
